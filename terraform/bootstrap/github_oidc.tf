@@ -49,7 +49,10 @@ resource "aws_iam_role" "github_actions" {
             # Any branch/tag/PR in this one repo may assume the role; the
             # workflow itself (triggers: push to main, workflow_dispatch)
             # is what actually restricts when apply runs.
-            "token.actions.githubusercontent.com:sub" = "repo:${var.github_repository}:*"
+            "token.actions.githubusercontent.com:sub": [
+              "repo:${var.github_repository}",
+              "repo:${var.github_repository}:*"
+            ]
           }
         }
       }

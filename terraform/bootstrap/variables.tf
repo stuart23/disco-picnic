@@ -25,7 +25,7 @@ variable "github_repository" {
 variable "create_github_oidc_provider" {
   description = "Whether to create the GitHub Actions OIDC provider in this AWS account. AWS allows only ONE OIDC provider per URL per account — set this to false (and the module will look up the existing one) if some other stack in this account already created https://token.actions.githubusercontent.com."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "site_bucket_name" {
