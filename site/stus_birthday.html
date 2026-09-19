@@ -1,0 +1,128 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+    <script src="http://www.webglearth.com/v2/api.js"></script>
+    <script>
+      function initialize() {
+        // Portrait
+        if (window.innerHeight > window.innerWidth) {
+          var zoom = 4;
+        } else {
+          var zoom = 2.5;
+        }
+        var options = {atmosphere: true, center: [10, 0], zoom: zoom};
+        var earth = new WE.map('earth_div', options);
+        WE.tileLayer('http://tileserver.maptiler.com/nasa/{z}/{x}/{y}.jpg', {
+          minZoom: 0,
+          maxZoom: 5,
+          attribution: 'NASA'
+        }).addTo(earth);
+
+	// Add a marker
+        var marker = WE.marker([31.2304, 121.4737]).addTo(earth);
+        marker.bindPopup("<b>Stuart</b></br>Shanghai", {maxWidth: 50, closeButton: false}).openPopup();
+
+        // Start a simple rotation animation
+        var before = null;
+        requestAnimationFrame(function animate(now) {
+            var c = earth.getPosition();
+            var elapsed = before? now - before: 0;
+            before = now;
+            earth.setCenter([c[0], c[1] + 0.1*(elapsed/15)]);
+            requestAnimationFrame(animate);
+        });
+      }
+    </script>
+    <style>
+      html, body{
+        padding: 0;
+        margin: 0;
+        font-family: 'Roboto';
+        background-color: #000;
+      }
+      #earth_div{
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-color: #000;
+        position: fixed !important;
+        z-index: 1; /* Specify a stack order in case you're using a different order for other elements */
+        cursor: pointer; /* Add a pointer on hover */
+        overflow: hidden;
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+      #scrollarea{
+        position: fixed; /* Sit on top of the page content */
+        width: 100%; /* Full width (cover the whole page) */
+        height: 100%; /* Full height (cover the whole page) */
+        overflow: auto; /* Scrollable */
+        z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+        align-items: center;
+      }
+      #overlay {
+        position: relative;
+        width: 50%; /* Full width (cover the whole page) */
+        padding: 10px;
+        top: 80%;
+        left: 50%;
+        transform: translate(-50%, 0%);
+        border: 5px solid rgba(200,200,200,1);
+        border-radius: 5px;
+        background-color: rgba(255,255,255,0.5); /* Black background with opacity */
+        z-index: 3; /* Specify a stack order in case you're using a different order for other elements */
+        visibility: visible;
+      }
+      </style>
+      <title>Stu's 33rd Birthday Dinner</title>
+    </head>
+    <body onload="initialize()">
+      <div id="scrollarea">
+        <div id="overlay">
+          <p>
+            While we're all stuck at home and cannot go out to see the world,
+            maybe we can bring a bit of the world back to our dining tables.
+          </p><p>
+            Let's go on a world tour without breaking any quarantine rules. To
+            do this, we need each person to pick their favourite place in the
+            world and cook a dish that best represents that place. Let’s see
+            your paella from Pamplona, your dahl from Dehli, or your omakase
+            from Osaka.
+          </p><p>
+            <h2>The contest:</h2>
+            There are two categories for judging, and a winner will be awarded
+            for each category. The categories are as follows:
+            <h3>Gastronomy: </h3>
+            Each person is to bring a dish that represents their chosen
+            favourite place. Dishes will be judged on effort and technical
+            skills, presentation, overt use of adjectives to describe the
+            dishes elements, and taste based on your reaction to tasting it.
+            <h3>Ambience: </h3>
+            The environment is as important to the experience as the food
+            itself. A costume and props that represents your chosen location
+            will put you in the forefront of winning this category. As we will
+            be on Zoom, choosing an appropriate background image to complement
+            your theme will be paramount.
+          </p><p>
+            the winners of each of the events will be able to
+          </p><p>
+            <h2>RSVP:</h2>
+            Send a text message to ‪(512) 910-4946‬ with your name and favourite
+            place to receive the Zoom invite and to reserve your place on the
+            globe. Alternatively, reach out directly to me.
+          </p><p>
+            <h2>About the judges:</h2>
+            <b>Stuart Buckingham</b> -
+            Stuart has been eating food for 33 years. Having pioneered food
+            crazes such as breakfast pizza (bacon, egg, cheese and cereal on a
+            pizza), and prison ramen (instant noodles mixed with instant miso
+            soup), he is considered a visionary in the culinary scene in Texas
+            and abroad.
+          </p>
+        </div>
+    <div id="earth_div"></div>
+  </div>
+  </body>
+</html>
