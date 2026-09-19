@@ -34,7 +34,11 @@ jobs:
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+          # Accepts the role ARN whether it was saved as an Actions
+          # Variable or a Secret (README previously said either was fine —
+          # this covers both so a "Could not load credentials" failure
+          # can't come down to which tab you pasted it into).
+          role-to-assume: ${{ vars.AWS_GITHUB_ACTIONS_ROLE_ARN || secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
           aws-region: us-east-1
 
       - name: Setup Terraform
