@@ -36,7 +36,11 @@ resource "aws_iam_role" "github_actions" {
       {
         Effect    = "Allow"
         Principal = { Federated = local.github_oidc_provider_arn }
-        Action    = "sts:AssumeRoleWithWebIdentity"
+        # aws-actions/configure-aws-credentials tags the assumed session with
+        # repo/branch/commit/actor info by default (useful in CloudTrail) —
+        # that requires sts:TagSession in the same call, or AWS rejects the
+        # whole AssumeRoleWithWebIdentity request.
+        Action = ["sts:AssumeRoleWithWebIdentity", "sts:TagSession"]
         Condition = {
           StringEquals = {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
