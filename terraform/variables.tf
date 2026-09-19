@@ -1,7 +1,7 @@
 variable "aws_region" {
-  description = "AWS region for the S3 bucket. CloudFront itself is global, but ACM certs used by CloudFront must live in us-east-1."
+  description = "AWS region the S3 bucket actually lives in (confirmed via the CloudFront origin: disco-picnic.com.s3-website-us-west-1.amazonaws.com). CloudFront itself is a global service and isn't affected by this setting."
   type        = string
-  default     = "us-east-1"
+  default     = "us-west-1"
 }
 
 variable "bucket_name" {
