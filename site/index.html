@@ -199,10 +199,16 @@
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 
+      // decay defaults to 2 (physically-based inverse-square falloff) as of
+      // Three.js r155+. This code was written when lights didn't attenuate
+      // over distance by default, so intensity 1 at ~200 units away is now
+      // effectively zero light — rendering the MeshPhongMaterial sphere
+      // pure black regardless of its texture. decay: 0 restores the flat,
+      // non-attenuating behavior this was authored for.
       var lights = [];
-      lights[ 0 ] = new THREE.PointLight( 0xffffff, 1, 0 );
-      lights[ 1 ] = new THREE.PointLight( 0xffffff, 1, 0 );
-      lights[ 2 ] = new THREE.PointLight( 0xffffff, 1, 0 );
+      lights[ 0 ] = new THREE.PointLight( 0xffffff, 1, 0, 0 );
+      lights[ 1 ] = new THREE.PointLight( 0xffffff, 1, 0, 0 );
+      lights[ 2 ] = new THREE.PointLight( 0xffffff, 1, 0, 0 );
 
       lights[ 0 ].position.set( 0, 200, 0 );
       lights[ 1 ].position.set( 100, 200, 100 );
