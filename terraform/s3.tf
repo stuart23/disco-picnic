@@ -19,3 +19,22 @@ resource "aws_s3_bucket" "site" {
 # want it under management too, run:
 #   aws s3api get-bucket-website --bucket disco-picnic.com
 # and I can turn that into a resource block here.
+
+# Assets are apparently also being fetched directly from the S3 REST
+# endpoint (not just through CloudFront's website-endpoint origin), which
+# had no CORS rules at all. This allows GET/HEAD from the site's own
+# domains and the CloudFront distribution's own hostname.
+resource "aws_s3_bucket_cors_configuration" "site" {
+  bucket = aws_s3_bucket.site.id
+
+  cors_rule {
+    allowed_methods = ["GET", "HEAD"]
+    allowed_origins = [
+      "https://${var.domain_name}",
+      "https://www.${var.domain_name}",
+      "https://${aws_cloudfront_distribution.site.domain_name}",
+    ]
+    allowed_headers = ["*"]
+    max_age_seconds = 3000
+  }
+}
