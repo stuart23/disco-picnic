@@ -163,17 +163,41 @@
   <script type="module">
     import * as THREE from 'three';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import WebGL from 'three/addons/capabilities/WebGL.js';
     var mesh, renderer, scene, camera;
-    init();
-    render();
+
+    if ( WebGL.isWebGL2Available() ) {
+      init();
+      render();
+    } else {
+      document.body.appendChild( WebGL.getWebGL2ErrorMessage() );
+    }
+
     function init() {
       scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0xffffff );
 
-      renderer = new THREE.WebGLRenderer();
+      // Create our own canvas up front and hand it to the renderer
+      // explicitly, instead of letting THREE.WebGLRenderer() create one
+      // implicitly. Some browser engines will refuse a context request on
+      // THREE's implicitly-created canvas with "Canvas has an existing
+      // context of a different type" if anything else touches that canvas
+      // first (e.g. a screenshot/thumbnailing tool); owning canvas creation
+      // ourselves avoids that race, and the try/catch gives a visible
+      // failure instead of a silently blank scene either way.
+      var canvasEl = document.createElement( 'canvas' );
+      document.body.appendChild( canvasEl );
+
+      try {
+        renderer = new THREE.WebGLRenderer( { canvas: canvasEl, antialias: true } );
+      } catch ( error ) {
+        console.error( 'THREE.WebGLRenderer failed to initialize:', error );
+        canvasEl.remove();
+        document.body.appendChild( WebGL.getWebGL2ErrorMessage() );
+        return;
+      }
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-      document.body.appendChild( renderer.domElement );
 
       var lights = [];
       lights[ 0 ] = new THREE.PointLight( 0xffffff, 1, 0 );
@@ -223,9 +247,16 @@
       ];
 
       var random_pic = picture_array[Math.floor(Math.random()*picture_array.length)];
-      var pic_url = "https://s3.us-west-1.amazonaws.com/disco-picnic.com/" + random_pic
+      var pic_url = random_pic; // relative to the page's own origin
       console.log("Pic = ", pic_url);
-      var texture = new THREE.TextureLoader().load( pic_url, render );
+      var texture = new THREE.TextureLoader().load(
+        pic_url,
+        render,
+        undefined,
+        function onTextureError( error ) {
+          console.error( 'Failed to load texture', pic_url, error );
+        }
+      );
       texture.wrapS = THREE.RepeatWrapping;
       texture.wrapT = THREE.RepeatWrapping;
       texture.repeat.set( 24, 16 );
